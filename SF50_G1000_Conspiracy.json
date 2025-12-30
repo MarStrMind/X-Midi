@@ -4,7 +4,6 @@
     "init":
     [],
     "knob_trigger_amount": 1,
-    "slider_trigger_amount": 1,
     "triggers":
     [
         {
