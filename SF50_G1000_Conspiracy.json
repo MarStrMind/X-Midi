@@ -1,0 +1,399 @@
+{
+    "input": "Conspiracy 0",
+    "output": "Conspiracy 1",
+    "init":
+    [],
+    "knob_trigger_amount": 1,
+    "slider_trigger_amount": 1,
+    "triggers":
+    [
+        {
+            "type": "knob",
+            "control": 16,
+            "channel": 0,
+            "interrupt": 41,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "r", "mod": "" },
+                { "change": "decrease", "key": "o", "mod": "" }
+            ]
+        },
+        {
+            "type": "knob",
+            "control": 20,
+            "channel": 0,
+            "interrupt": 37,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "t", "mod": "" },
+                { "change": "decrease", "key": "p", "mod": "" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 17,
+            "channel": 0,
+            "interrupt": 42,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "u", "mod": "" },
+                { "change": "decrease", "key": "s", "mod": "" }
+            ]
+        },
+        {
+            "type": "knob",
+            "control": 21,
+            "channel": 0,
+            "interrupt": 38,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "i", "mod": "" },
+                { "change": "decrease", "key": "d", "mod": "" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 18,
+            "channel": 0,
+            "interrupt": 43,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "z", "mod": "shift" },
+                { "change": "decrease", "key": "z", "mod": "ctrl" }
+            ]
+        },
+        {
+            "type": "knob",
+            "control": 22,
+            "channel": 0,
+            "interrupt": 39,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "t", "mod": "shift" },
+                { "change": "decrease", "key": "t", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 19,
+            "channel": 0,
+            "interrupt": 44,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "i", "mod": "shift" },
+                { "change": "decrease", "key": "i", "mod": "ctrl" }
+            ]
+        },
+        {
+            "type": "knob",
+            "control": 23,
+            "channel": 0,
+            "interrupt": 40,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "h", "mod": "shift" },
+                { "change": "decrease", "key": "h", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 10,
+            "channel": 4,
+            "interrupt": 45,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "u", "mod": "shift" },
+                { "change": "decrease", "key": "u", "mod": "ctrl" }
+            ]
+        },
+        {
+            "type": "knob",
+            "control": 10,
+            "channel": 5,
+            "interrupt": 47,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "b", "mod": "shift" },
+                { "change": "decrease", "key": "b", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 10,
+            "channel": 0,
+            "interrupt": 37,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "r", "mod": "shift" },
+                { "change": "decrease", "key": "r", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 10,
+            "channel": 1,
+            "interrupt": 37,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "n", "mod": "" },
+                { "change": "decrease", "key": "m", "mod": "" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 10,
+            "channel": 2,
+            "interrupt": 37,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "k", "mod": "ctrl" },
+                { "change": "decrease", "key": "k", "mod": "shift" }
+            ]
+        },
+
+        {
+            "control": 46,
+            "channel": 0,
+            "type": "button",
+            "key": "f",
+            "mod": "shift",
+            "layer": 1,
+            "trigger": "normal"
+        },
+
+        {
+            "control": 12,
+            "channel": 1,
+            "type": "button",
+            "key": "1",
+            "mod": "ctrl",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 17,
+            "channel": 1,
+            "type": "button",
+            "key": "2",
+            "mod": "ctrl",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 27,
+            "channel": 1,
+            "type": "button",
+            "key": "1",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 32,
+            "channel": 1,
+            "type": "button",
+            "key": "2",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+
+        {
+            "control": 13,
+            "channel": 1,
+            "type": "button",
+            "key": "f3",
+            "mod": "",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 18,
+            "channel": 1,
+            "type": "button",
+            "key": "0",
+            "mod": "",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 23,
+            "channel": 1,
+            "type": "button",
+            "key": "f2",
+            "mod": "",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+
+        {
+            "control": 14,
+            "channel": 1,
+            "type": "button",
+            "key": "3",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "normal"
+        },
+        {
+            "control": 19,
+            "channel": 1,
+            "type": "button",
+            "key": "4",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 24,
+            "channel": 1,
+            "type": "button",
+            "key": "6",
+            "mod": "",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+
+        {
+            "control": 15,
+            "channel": 1,
+            "type": "button",
+            "key": "5",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 20,
+            "channel": 1,
+            "type": "button",
+            "key": "6",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 25,
+            "channel": 1,
+            "type": "button",
+            "key": "7",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+
+        {
+            "control": 31,
+            "channel": 1,
+            "type": "button",
+            "key": "8",
+            "mod": "alt",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+        {
+            "control": 36,
+            "channel": 1,
+            "type": "button",
+            "key": "m",
+            "mod": "ctrl",
+            "layer": 1,
+            "trigger": "toggle"
+        },
+
+        {
+            "control": 33,
+            "channel": 1,
+            "type": "button",
+            "key": "e",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+        {
+            "control": 34,
+            "channel": 1,
+            "type": "button",
+            "key": "a",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+        {
+            "control": 35,
+            "channel": 1,
+            "type": "button",
+            "key": "h",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+
+        {
+            "control": 28,
+            "channel": 1,
+            "type": "button",
+            "key": "q",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+        {
+            "control": 29,
+            "channel": 1,
+            "type": "button",
+            "key": "y",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+        {
+            "control": 30,
+            "channel": 1,
+            "type": "button",
+            "key": "f",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+
+        {
+            "control": 26,
+            "channel": 1,
+            "type": "button",
+            "key": "a",
+            "mod": "ctrl",
+            "layer": 1,
+            "trigger": "normal"
+        },
+        {
+            "control": 21,
+            "channel": 1,
+            "type": "button",
+            "key": "p",
+            "mod": "ctrl",
+            "layer": 1,
+            "trigger": "normal"
+        }
+    ]
+}
