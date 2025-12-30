@@ -151,12 +151,16 @@ def handle_midi_message(message, json_data):
 
 								if l == "increase":
 									if v >= (kn_value[knpos][2] + kn_tr_amount):
+										for p in range(kn_value[knpos][2], kn_value[knpos][2] + kn_tr_amount):
+											press_key(k, m)
 										kn_value[knpos][2] = v
-										press_key(k, m)
+										
 								if l == "decrease":
 									if v <= (kn_value[knpos][2] - kn_tr_amount):
 										kn_value[knpos][2] = v
-										press_key(k, m)
+										for p in reversed(range(kn_value[knpos][2] - kn_tr_amount, kn_value[knpos][2])):
+											press_key(k, m)
+										kn_value[knpos][2] = v
 
 			# Slider went up or down
 			if json_data["triggers"][i]["type"] == "slider":
