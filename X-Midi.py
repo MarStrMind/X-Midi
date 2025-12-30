@@ -27,12 +27,6 @@ def send_midi(type, note, data):
 	midi_out.send(mido.Message(type, note=n, velocity=s))
 
 
-def midi_test(channel, control, value):
-	global midi_out
-	midi_out.send(mido.Message("control_change", channel=channel, control=control, value=value, time=0))
-	midi_out.close()
-
-
 # Attempt to reset lights
 def reset_lights(mididev):
 	for i in range(127):
@@ -242,13 +236,14 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 	json_profile = sys.argv[1]
 	json_f = open(json_profile, "r")
 	json_data = json.loads(json_f.read())
+	
 	input_port_name = json_data["input"]
+	output_port_name = json_data["output"]
 
 	find_interrupt_buttons(json_data)
 	find_all_knobs(json_data)
 
 	if len(sys.argv) == 4:
-		output_port_name = json_data["output"]
 		midi_out = mido.open_output(output_port_name)
 
 		for i in range(0, 127):
@@ -265,6 +260,7 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 
 	try:
 		midi_in = mido.open_input(input_port_name)
+		midi_out = mido.open_output(output_port_name)
 
 		while True:
 			for message in midi_in.iter_pending():
