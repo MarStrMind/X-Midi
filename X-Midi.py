@@ -4,34 +4,31 @@ import json
 from time import sleep
 import keyboard
 
-
 # For knobs and sliders
-#kn_interrupt = False
 kn_interrupt = []
 kn_value = []
 
-kn_tr_amount = 0
-sl_prv_value = -1
-sl_tr_value  = 0
-
+# Delta at which a knob turning motion in one direction is being detected
+kn_tr_amount = 1
 
 # Active layer
 act_layer = 1
 
+# For sending signals to the target device
+# - will be opened at init
+midi_out = None
+
 
 # Send a midi signal
-def send_midi(mididev, type, note, data):
-	output_port_name = mididev
-	midi_out = mido.open_output(output_port_name)
+def send_midi(type, note, data):
+	global midi_out
 	n = note
 	s = data
 	midi_out.send(mido.Message(type, note=n, velocity=s))
-	midi_out.close()
 
 
-def midi_test(mididev, channel, control, value):
-	output_port_name = mididev
-	midi_out = mido.open_output(output_port_name)
+def midi_test(channel, control, value):
+	global midi_out
 	midi_out.send(mido.Message("control_change", channel=channel, control=control, value=value, time=0))
 	midi_out.close()
 
@@ -76,9 +73,9 @@ def press_key(key, mod, func="normal"):
 			keyboard.release(mod+"+"+key)
 		else:
 			keyboard.release(key)
-	if func == "layer_up":
+	if key == "layer_up":
 		change_active_layer("up")
-	if func == "layer_down":
+	if key == "layer_down":
 		change_active_layer("down")
 
 
@@ -159,53 +156,32 @@ def handle_midi_message(message, json_data):
 								m = json_data["triggers"][i]["events"][j]["mod"]
 
 								if l == "increase":
-									if v > (kn_value[knpos][2] + kn_tr_amount):
+									if v >= (kn_value[knpos][2] + kn_tr_amount):
 										kn_value[knpos][2] = v
 										press_key(k, m)
 								if l == "decrease":
-									if v < (kn_value[knpos][2] - kn_tr_amount):
+									if v <= (kn_value[knpos][2] - kn_tr_amount):
 										kn_value[knpos][2] = v
 										press_key(k, m)
 
 			# Slider went up or down
 			if json_data["triggers"][i]["type"] == "slider":
-				global sl_prv_value
-				global sl_tr_value
-
-				# Trigger only at delta of this number, if present
-				if json_data["slider_trigger_amount"]:
-					sl_tr_amount = json_data["slider_trigger_amount"]
+				global sl_value
 
 				if message.type == "control_change":
+
 					v = message.value
 					c = message.control
-					if json_data["triggers"][i]["control"] == c:
-						if json_data["triggers"][i]["events"]:
-							for j in range(len(json_data["triggers"][i]["events"])):
+					cn = message.channel
 
-								if "change" in json_data["triggers"][i]["events"][j]:
-									l = json_data["triggers"][i]["events"][j]["change"]
-									k = json_data["triggers"][i]["events"][j]["key"]
-									m = json_data["triggers"][i]["events"][j]["mod"]
-									if l == "increase":
-										if v > (sl_prv_value + sl_tr_amount):
-											sl_prv_value = v
-											press_key(k, m)
-									if l == "decrease":
-										if v < (sl_prv_value - sl_tr_amount):
-											sl_prv_value = v
-											press_key(k, m)
+					if json_data["triggers"][i]["control"] == c and json_data["triggers"][i]["channel"] == cn:
+						
+						for j in range(len(json_data["triggers"][i]["events"])):
+							if v == json_data["triggers"][i]["events"][j]["value"]:
+								k = json_data["triggers"][i]["events"][j]["key"]
+								m = json_data["triggers"][i]["events"][j]["mod"]
 
-								if "value" in json_data["triggers"][i]["events"][j]:
-									if v == json_data["triggers"][i]["events"][j]["value"]:
-										k = json_data["triggers"][i]["events"][j]["key"]
-										m = json_data["triggers"][i]["events"][j]["mod"]
-										f = json_data["triggers"][i]["events"][j]["func"]
-
-										if f == "":
-											press_key(k, m)
-										else:
-											press_key(k, m, f)
+								press_key(k, m)
 
 
 # Display MIDI messages of the device specified
