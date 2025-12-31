@@ -157,6 +157,9 @@ This effectively turns knobs that are limited to 0-127 into knobs that can be tu
 
 You can set which keys are pressed when the value decreases or increases.
 
+**Important**: The control (or rather, the button) you define as interrupt is layer-independent. I made it this way so that you can use the same Interrupt buttons for all layers.
+
+
 **Buttons**
 
 Arguably the easiest to configure - you basically define the control and the channel of the button, and define which keypress should be emitted when this MIDI button is pressed.
