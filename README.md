@@ -104,7 +104,6 @@ These are, to my knowledge, covering all available controls on a MIDI controller
     "input": "Input Name 0",
     "output": "Output Name 1",
     "knob_trigger_amount": 1,
-    "slider_trigger_amount": 1,
     "triggers":
     [
         {
