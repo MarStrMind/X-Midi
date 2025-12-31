@@ -157,7 +157,7 @@ This effectively turns knobs that are limited to 0-127 into knobs that can be tu
 
 You can set which keys are pressed when the value decreases or increases.
 
-**Important**: The control (or rather, the button) you define as interrupt is layer-independent. I made it this way so that you can use the same Interrupt buttons for all layers.
+**Important**: The control (or rather, the button) you define as interrupt is layer- and channel-independent. I made it this way so that you can use the same Interrupt buttons for all layers.
 
 
 **Buttons**
