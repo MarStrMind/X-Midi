@@ -102,29 +102,14 @@ def handle_midi_message(message, json_data):
 
 			# A knob has been turned
 			if json_data["triggers"][i]["type"] == "knob":
-				global kn_interrupt
 				global kn_value
 				global kn_tr_amount
-				#global kn_prv_value
 
 				# Trigger only at delta of this number, if present
 				if json_data["knob_trigger_amount"]:
 					kn_tr_amount = json_data["knob_trigger_amount"]
 
-				# Determine if the interrupt was pressed
-				intpos = -1
-				if message.type == "note_on":
-					if message.note == json_data["triggers"][i]["interrupt"]:
-						for i in range(0, len(kn_interrupt)-1):
-							if kn_interrupt[i][0] == message.note:
-								if kn_interrupt[i][1] == 0:
-									kn_interrupt[i][1] = 1
-								else:
-									kn_interrupt[i][1] = 0
-								intpos = i
-								break
-
-				elif message.type == "control_change":
+				if message.type == "control_change":
 
 					c = message.control
 					v = message.value
@@ -138,12 +123,32 @@ def handle_midi_message(message, json_data):
 								knpos = k
 								break
 
-						int_active = 0
-						for it in kn_interrupt:
-							if it[0] == json_data["triggers"][i]["interrupt"]:
-								int_active = it[1]
+						# Engage soft clutch as needed
+						if v == 0:
+							kn_value[knpos][3] = 1
+							kn_value[knpos][4] = 0
+						if v == 127:
+							kn_value[knpos][3] = 1
+							kn_value[knpos][4] = 1
 
-						if int_active == 0:
+						# Determine if we need to release the interrupt
+						
+						if kn_value[knpos][3] == 1:
+							# Interrupt for left direction, knob needs to be turned right
+							# beyond the provided release value
+							if kn_value[knpos][4] == 0:
+								if v >= 0 + json_data["interrupt_release"]:
+									kn_value[knpos][2] = v
+									kn_value[knpos][3] = 0
+							# Interrupt for right direction, knob needs to be turned left
+							# beyond the provided release value
+							if kn_value[knpos][4] == 1:
+								if v <= 127 - json_data["interrupt_release"]:
+									kn_value[knpos][2] = v
+									kn_value[knpos][3] = 0
+
+						# Only act if interrupt is not active
+						if kn_value[knpos][3] == 0:
 							for j in range(len(json_data["triggers"][i]["events"])):
 								l = json_data["triggers"][i]["events"][j]["change"]
 								k = json_data["triggers"][i]["events"][j]["key"]
@@ -186,20 +191,13 @@ def handle_midi_message(message, json_data):
 def handle_midi_test(message):
 	print(f"{message}")
 
-
-# Find all interrupt buttons in the JSON, and note an initial state
-def find_interrupt_buttons(json_data):
-	for t in json_data["triggers"]:
-		if t["type"] == "knob":
-			if [t["interrupt"], 0] not in kn_interrupt:
-				kn_interrupt.append([t["interrupt"], 0])
-
 # Find all knobs and give them an initial value
 def find_all_knobs(json_data):
 	for t in json_data["triggers"]:
 		if t["type"] == "knob":
 			if [t["control"], t["channel"], 0] not in kn_value:
-				kn_value.append([t["control"], t["channel"], 0])
+				# Control, Channel, Value, 0/1 - Interrupt on, 0/1 - direction of interrupt
+				kn_value.append([t["control"], t["channel"], 1, 0, 0])
 
 
 # List MIDI devices
@@ -244,7 +242,6 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 	input_port_name = json_data["input"]
 	output_port_name = json_data["output"]
 
-	find_interrupt_buttons(json_data)
 	find_all_knobs(json_data)
 
 	if len(sys.argv) == 4:

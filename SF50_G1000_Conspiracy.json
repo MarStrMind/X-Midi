@@ -4,6 +4,7 @@
     "init":
     [],
     "knob_trigger_amount": 1,
+    "interrupt_release": 35,
     "triggers":
     [
         {
