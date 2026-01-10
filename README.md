@@ -78,6 +78,19 @@ Next, define your knob trigger amount - the delta amount at which the script det
 }
 ```
 
+When you turn a knob and it hits either end - value 0 (left) or value 127 (right), it automatically enters an interrupt mode - sort of a soft brake for the knob. You then need to turn it a bit to the opposite direction, and the "brake" releases. There is a setting for that, which you need to define. It is the value at which the brake gets released, when you turn in either opposite direction: 
+
+```
+{
+    "input": "Input Name 0",
+    "output": "Output Name 1",
+    "knob_trigger_amount": 1,
+    "interrupt_release": 35
+}
+```
+
+I believe 35 is a reasonable value - but you can adjust this to your liking.
+
 Next, put in your triggers section - the area that defines what is happening at certain events... basically the Big Mac, the heart of this implementation:
 
 ```
@@ -85,6 +98,7 @@ Next, put in your triggers section - the area that defines what is happening at 
     "input": "Input Name 0",
     "output": "Output Name 1",
     "knob_trigger_amount": 1,
+    "interrupt_release": 35,
     "triggers":
     [
     ]
@@ -104,13 +118,13 @@ These are, to my knowledge, covering all available controls on a MIDI controller
     "input": "Input Name 0",
     "output": "Output Name 1",
     "knob_trigger_amount": 1,
+    "interrupt_release": 35,
     "triggers":
     [
         {
             "type": "knob",
             "control": 16,
             "channel": 0,
-            "interrupt": 41,
             "layer": 1,
             "events":
             [
@@ -145,19 +159,11 @@ These are, to my knowledge, covering all available controls on a MIDI controller
 
 **Knobs**
 
-For knobs, there is an important entry: ```interrupt```. You will need to define the button or control you want to press to "interrupt" the reading of this knob.
+I have updated the code so that there is a kind of "auto-interrupt", as knobs mostly only register values from 0 to 127.
 
-I have built this as on some controllers, the knobs only go from 0-127 with their signals and do not support other message types. It works like this:
+If a button hits either end, say 127 because you turned it to the right, the interrupt automatically activates. You now need to turn the button to the left, until the value is 127 minus the value you specified in the ```interrupt_release``` value at the top of the JSON. In my example, it's 35 - so the value of the knob will have to be either equal to or less than 92 for the right turn to become operational again.
 
-- Knob turned to 127 - but you want to continue turning right - for example your heading bug for your autopilot
-- Press your Interrupt button, and rotate the knob left to value 0
-- Press your Interrupt button again and turn right
-
-This effectively turns knobs that are limited to 0-127 into knobs that can be turned endlessly. I have used this in my cockpit quite successfully.
-
-You can set which keys are pressed when the value decreases or increases.
-
-**Important**: The control (or rather, the button) you define as interrupt is layer- and channel-independent. I made it this way so that you can use the same Interrupt buttons for all layers.
+For the left direction it's exactly the opposite: the knob needs to be turned to the right until the value is equal to or higher than 35 (or your set value) before a left rotation motion registers again.
 
 
 **Buttons**
