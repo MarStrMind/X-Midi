@@ -18,6 +18,12 @@ act_layer = 1
 # - will be opened at init
 midi_out = None
 
+# Global array
+json_data = []
+
+# Wait for a short amount of time before the next loop iteration
+needsleep = True
+
 
 # Send a midi signal
 def send_midi(type, note, data):
@@ -75,10 +81,13 @@ def press_key(key, mod, func="normal"):
 
 # Handles a MIDI event.
 # Acts depending on what the event is.
-def handle_midi_message(message, json_data):
+def handle_midi_message(message):
 	global act_layer
+	global json_data
+	global needsleep
+	
 	for i in range(len(json_data["triggers"])):
-
+		
 		# Only react on those with the current active layer
 		if json_data["triggers"][i]["layer"] == act_layer:
 
@@ -94,10 +103,12 @@ def handle_midi_message(message, json_data):
 						if json_data["triggers"][i]["key"] != "RESET" and json_data["triggers"][i]["key"] != "layerup" and json_data["triggers"][i]["key"] != "layerdown":
 							k = json_data["triggers"][i]["key"]
 							m = json_data["triggers"][i]["mod"]
+							needsleep = False
 							press_key(k, m)
 				if message.type == "note_off" and message.note == json_data["triggers"][i]["control"] and json_data["triggers"][i]["channel"] == cn and json_data["triggers"][i]["trigger"] == "toggle":
 						k = json_data["triggers"][i]["key"]
 						m = json_data["triggers"][i]["mod"]
+						needsleep = False
 						press_key(k, m)
 
 			# A knob has been turned
@@ -122,6 +133,13 @@ def handle_midi_message(message, json_data):
 							if kn_value[k][0] == c and kn_value[k][1] == cn:
 								knpos = k
 								break
+
+						# Note initial value instead of the default value in array
+						# then exit loop
+						if kn_value[knpos][5] == 1:
+							kn_value[knpos][5] = 0
+							kn_value[knpos][2] = v
+							break
 
 						# Engage soft clutch as needed
 						if v == 0:
@@ -156,15 +174,21 @@ def handle_midi_message(message, json_data):
 
 								if l == "increase":
 									if v >= (kn_value[knpos][2] + kn_tr_amount):
-										for p in range(kn_value[knpos][2], kn_value[knpos][2] + kn_tr_amount):
-											press_key(k, m)
+										needsleep = False
+										press_key(k, m)
+										#for p in range(kn_value[knpos][2], kn_value[knpos][2] + kn_tr_amount):
+										#	needsleep = False
+										#	press_key(k, m)
 										kn_value[knpos][2] = v
 										
 								if l == "decrease":
 									if v <= (kn_value[knpos][2] - kn_tr_amount):
 										kn_value[knpos][2] = v
-										for p in reversed(range(kn_value[knpos][2] - kn_tr_amount, kn_value[knpos][2])):
-											press_key(k, m)
+										needsleep = False
+										press_key(k, m)
+										#for p in reversed(range(kn_value[knpos][2] - kn_tr_amount, kn_value[knpos][2])):
+										#	needsleep = False
+										#	press_key(k, m)
 										kn_value[knpos][2] = v
 
 			# Slider went up or down
@@ -184,6 +208,7 @@ def handle_midi_message(message, json_data):
 								k = json_data["triggers"][i]["events"][j]["key"]
 								m = json_data["triggers"][i]["events"][j]["mod"]
 
+								needsleep = False
 								press_key(k, m)
 
 
@@ -196,8 +221,8 @@ def find_all_knobs(json_data):
 	for t in json_data["triggers"]:
 		if t["type"] == "knob":
 			if [t["control"], t["channel"], 0] not in kn_value:
-				# Control, Channel, Value, 0/1 - Interrupt on, 0/1 - direction of interrupt
-				kn_value.append([t["control"], t["channel"], 1, 0, 0])
+				# Control, Channel, Value, 0/1 - Interrupt on, 0/1 - direction of interrupt, catch initial value = true (1)
+				kn_value.append([t["control"], t["channel"], 1, 0, 0, 1])
 
 
 # List MIDI devices
@@ -256,7 +281,7 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 			n = json_data["init"][i]["note"]
 			s = json_data["init"][i]["signal"]
 			midi_out.send(mido.Message("note_on", note=n, velocity=s))
-			sleep(0.01)
+			sleep(0.02)
 		midi_out.close()
 
 	try:
@@ -265,8 +290,9 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 
 		while True:
 			for message in midi_in.iter_pending():
-				handle_midi_message(message, json_data)
-			sleep(0.01)
+				handle_midi_message(message)
+			if needsleep == True:
+				sleep(.05)
 
 	except KeyboardInterrupt:
 		print("input stopped")
