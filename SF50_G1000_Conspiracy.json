@@ -12,22 +12,14 @@
             "control": 16,
             "channel": 0,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "r", "mod": "" },
-                { "change": "decrease", "key": "o", "mod": "" }
-            ]
+            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz"
         },
         {
             "type": "knob",
             "control": 20,
             "channel": 0,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "t", "mod": "" },
-                { "change": "decrease", "key": "p", "mod": "" }
-            ]
+            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz"
         },
 
         {
@@ -35,22 +27,14 @@
             "control": 17,
             "channel": 0,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "u", "mod": "" },
-                { "change": "decrease", "key": "s", "mod": "" }
-            ]
+            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_khz"
         },
         {
             "type": "knob",
             "control": 21,
             "channel": 0,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "i", "mod": "" },
-                { "change": "decrease", "key": "d", "mod": "" }
-            ]
+            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_Mhz"
         },
 
         {
@@ -69,11 +53,7 @@
             "control": 22,
             "channel": 0,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "t", "mod": "shift" },
-                { "change": "decrease", "key": "t", "mod": "ctrl" }
-            ]
+            "dataref": "sim/cockpit2/autopilot/altitude_dial_ft"
         },
 
         {
@@ -104,22 +84,14 @@
             "control": 10,
             "channel": 4,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "u", "mod": "shift" },
-                { "change": "decrease", "key": "u", "mod": "ctrl" }
-            ]
+            "dataref": "sim/cockpit/autopilot/heading"
         },
         {
             "type": "knob",
             "control": 10,
             "channel": 5,
             "layer": 1,
-            "events":
-            [
-                { "change": "increase", "key": "b", "mod": "shift" },
-                { "change": "decrease", "key": "b", "mod": "ctrl" }
-            ]
+            "dataref": "sim/cockpit/misc/barometer_setting"
         },
 
         {

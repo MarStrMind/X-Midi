@@ -8,6 +8,11 @@ I have personally successfully flown the Cessna Skyhawk 172 and the Cirrus Visio
 
 In theory, you could also use this script and your MIDI controller to control your Twitch livestream, effectively turning your MIDI controller into an advanced Stream Deck. In more extreme scenarios, you could control your plane AND your stream at the same time. The only limit is your imagination, really.
 
+## Acknowledgement
+
+The Python class ```XPlaneUdp``` found in the file ```xpudp.py```, which is used to manipulate X-Plane Datarefs with this script, is developed by Charly Lima, and can be found here: https://github.com/charlylima/XPlaneUDP .
+
+
 ## Requirements
 
 - One of these: Windows, Linux (or Unix-like), macOS
@@ -134,6 +139,14 @@ These are, to my knowledge, covering all available controls on a MIDI controller
         },
 
         {
+            "type": "knob",
+            "control": 17,
+            "channel": 0,
+            "layer": 1,
+            "dataref": "sim/cockpit2/autopilot/altitude_dial_ft"
+        },
+
+        {
             "type": "button",
             "control": 46,
             "channel": 0,
@@ -164,6 +177,8 @@ I have updated the code so that there is a kind of "auto-interrupt", as knobs mo
 If a button hits either end, say 127 because you turned it to the right, the interrupt automatically activates. You now need to turn the button to the left, until the value is 127 minus the value you specified in the ```interrupt_release``` value at the top of the JSON. In my example, it's 35 - so the value of the knob will have to be either equal to or less than 92 for the right turn to become operational again.
 
 For the left direction it's exactly the opposite: the knob needs to be turned to the right until the value is equal to or higher than 35 (or your set value) before a left rotation motion registers again.
+
+Knobs can also manipulate datarefs you specify. More on that below.
 
 
 **Buttons**
@@ -210,6 +225,61 @@ For example, you could emit a keypress for Flaps Up at value 127, Flaps 2 at 60,
 The "mod" entry.
 
 Simple: "ctrl", "shift", or "alt".
+
+**Datarefs**
+
+Recently I added support for dataref manipulation within X-Plane. Technically speaking it is possible to manipulate just about any dataref that has some kind of value attached to it, for example Altitude or radio frequencies.
+
+For this to work you will 1) need to define the datarefs you want to access and manipulate, and 2) reference these in the configuration file for your MIDI controller.
+
+This repo has an example ```dataref.json``` which I am currently using. In this file, you will find some values and paramaters. Let's look at the Heading Bug as an example:
+
+```
+{
+    "datarefs":
+    [
+        { "dataref": "sim/cockpit/autopilot/heading", "step": 1, "minimum": 0, "maximum": 360 }
+    ]
+}
+```
+
+If you want to use more datarefs, or different ones than I use, you will have to extend and/or adjust the datarefs.json file accordingly.
+
+You can see within the "datarefs" array section that there is a single defining entry. Let me explain.
+
+*dataref*: The name of the actual dataref we want to alter during the flight.
+*step*: The value by which we want to increase or decrease the current value. In this case, 1 will be added or subtracted.
+*minimum*: The minimum value of the dataref. In this case 0.
+*maximum*: The maximum value of the dataref. In this case 360.
+
+These values will have to be entered for every dataref you want to access.
+
+To demonstrate the minimum and maximum values in a different example, this is what the Nav1 frequency Mhz entry looks like:
+
+```{ "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz", "step": 1, "minimum": 108, "maximum": 117 }```
+
+As you can see, the lowest value can be 108, while the highest can only be 117.
+
+What happens if the maximum number is encountered?
+
+It will wrap around to the lowest value and start increasing again.
+
+Inversely, when the lowest value is encountered, it will wrap around to the highest value and start to decrease again.
+
+To change this dataref with a knob, you will have to specify it like so:
+
+```
+{
+    "type": "knob",
+    "control": 22,
+    "channel": 0,
+    "layer": 1,
+    "dataref": "sim/cockpit2/autopilot/altitude_dial_ft"
+},
+```
+
+Increase and decrease will automatically be handled for you with these dataref entries.
+
 
 **Layers**
 
