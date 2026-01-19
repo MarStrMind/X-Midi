@@ -192,26 +192,21 @@ def handle_midi_message(message):
 									break
 
 							# Only act if interrupt is not active
+							val = kn_value[knpos][2]
 							if kn_value[knpos][3] == 0:
 								if v >= (kn_value[knpos][2] + kn_tr_amount):
-									kn_value[knpos][2] = v
 									val = kn_dataref[drefpos][3] + step_value
-									if val > max_value:
-										val = min_value
-									if val < min_value:
-										val = max_value
-									kn_dataref[drefpos][3] = val
-									dref.WriteDataRef(json_data["triggers"][i]["dataref"], val)
 
 								if v <= (kn_value[knpos][2] - kn_tr_amount):
-									kn_value[knpos][2] = v
 									val = kn_dataref[drefpos][3] - step_value
-									if val > max_value:
-										val = min_value
-									if val < min_value:
-										val = max_value
-									kn_dataref[drefpos][3] = val
-									dref.WriteDataRef(json_data["triggers"][i]["dataref"], val)
+								
+								kn_value[knpos][2] = v
+								if val > max_value:
+									val = min_value
+								if val < min_value:
+									val = max_value
+								kn_dataref[drefpos][3] = val
+								dref.WriteDataRef(json_data["triggers"][i]["dataref"], val)
 
 
 						# Non-dataref based, some key should be pressed
