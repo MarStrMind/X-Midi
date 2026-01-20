@@ -192,8 +192,8 @@ def handle_midi_message(message):
 									break
 
 							# Only act if interrupt is not active
-							val = kn_value[knpos][2]
 							if kn_value[knpos][3] == 0:
+								val = kn_dataref[drefpos][3]
 								if v >= (kn_value[knpos][2] + kn_tr_amount):
 									val = kn_dataref[drefpos][3] + step_value
 

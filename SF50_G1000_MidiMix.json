@@ -1,0 +1,276 @@
+{
+    "input": "MIDI Mix 0",
+    "output": "MIDI Mix 1",
+    "init":
+    [],
+    "knob_trigger_amount": 1,
+    "interrupt_release": 63,
+    "triggers":
+    [
+        {
+            "type": "knob",
+            "control": 99,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_Mhz"
+        },
+        {
+            "type": "knob",
+            "control": 20,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_khz"
+        },
+        {
+            "type": "knob",
+            "control": 24,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_Mhz"
+        },
+        {
+            "type": "knob",
+            "control": 60,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_khz"
+        },
+        {
+            "type": "knob",
+            "control": 17,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz"
+        },
+        {
+            "type": "knob",
+            "control": 21,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz"
+        },
+        {
+            "type": "knob",
+            "control": 25,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_Mhz"
+        },
+        {
+            "type": "knob",
+            "control": 61,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_khz"
+        },
+
+        {
+            "type": "knob",
+            "control": 80,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit2/autopilot/altitude_dial_ft"
+        },
+
+        {
+            "type": "knob",
+            "control": 81,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit/misc/barometer_setting"
+        },
+
+        {
+            "type": "knob",
+            "control": 82,
+            "channel": 1,
+            "layer": 1,
+            "dataref": "sim/cockpit/autopilot/heading"
+        },
+
+        {
+            "type": "knob",
+            "control": 2,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "g", "mod": "shift" },
+                { "change": "decrease", "key": "g", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 93,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "h", "mod": "shift" },
+                { "change": "decrease", "key": "h", "mod": "ctrl" }
+            ]
+        },
+        {
+            "type": "knob",
+            "control": 92,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "i", "mod": "shift" },
+                { "change": "decrease", "key": "i", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 94,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "n", "mod": "" },
+                { "change": "decrease", "key": "m", "mod": "" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 91,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "r", "mod": "shift" },
+                { "change": "decrease", "key": "r", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 95,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "k", "mod": "ctrl" },
+                { "change": "decrease", "key": "k", "mod": "shift" }
+            ]
+        },
+
+        {
+            "type": "knob",
+            "control": 90,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "change": "increase", "key": "f12", "mod": "ctrl" },
+                { "change": "decrease", "key": "f11", "mod": "ctrl" }
+            ]
+        },
+
+        {
+            "type": "slider",
+            "control": 127,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "1", "mod": "ctrl" },
+                { "value": 127, "key": "1", "mod": "ctrl" }
+            ]
+        },
+        {
+            "type": "slider",
+            "control": 126,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "2", "mod": "ctrl" },
+                { "value": 127, "key": "2", "mod": "ctrl" }
+            ]
+        },
+        {
+            "type": "slider",
+            "control": 125,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "1", "mod": "alt" },
+                { "value": 127, "key": "1", "mod": "alt" }
+            ]
+        },
+        {
+            "type": "slider",
+            "control": 124,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "2", "mod": "alt" },
+                { "value": 127, "key": "2", "mod": "alt" }
+            ]
+        },
+
+        {
+            "type": "slider",
+            "control": 63,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "f3", "mod": "" },
+                { "value": 127, "key": "f3", "mod": "" }
+            ]
+        },
+        {
+            "type": "slider",
+            "control": 122,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "0", "mod": "" },
+                { "value": 127, "key": "0", "mod": "" }
+            ]
+        },
+        {
+            "type": "slider",
+            "control": 121,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "f2", "mod": "" },
+                { "value": 127, "key": "f2", "mod": "" }
+            ]
+        },
+
+        {
+            "type": "slider",
+            "control": 120,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "4", "mod": "alt" },
+                { "value": 127, "key": "4", "mod": "alt" }
+            ]
+        },
+        {
+            "type": "slider",
+            "control": 62,
+            "channel": 1,
+            "layer": 1,
+            "events":
+            [
+                { "value": 0, "key": "6", "mod": "" },
+                { "value": 127, "key": "6", "mod": "" }
+            ]
+        }
+    ]
+}
