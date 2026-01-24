@@ -63,11 +63,11 @@ def press_key(key, mod, func="normal"):
 	if func == "normal":
 		if mod != "":
 			keyboard.press(mod+"+"+key)
-			sleep(.05)
+			sleep(.2)
 			keyboard.release(mod+"+"+key)
 		else:
 			keyboard.press(key)
-			sleep(.05)
+			sleep(.2)
 			keyboard.release(key)
 	if func == "press":
 		if mod != "":
@@ -364,8 +364,9 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 		while True:
 			for message in midi_in.iter_pending():
 				handle_midi_message(message)
-			if needsleep == True:
-				sleep(.05)
+			#if needsleep == True:
+			#	sleep(.05)
+			sleep(.05)
 
 	except KeyboardInterrupt:
 		print("input stopped")

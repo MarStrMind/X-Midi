@@ -12,14 +12,14 @@
             "control": 16,
             "channel": 0,
             "layer": 1,
-            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz"
+            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_khz"
         },
         {
             "type": "knob",
             "control": 20,
             "channel": 0,
             "layer": 1,
-            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz"
+            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_Mhz"
         },
 
         {
@@ -27,14 +27,14 @@
             "control": 17,
             "channel": 0,
             "layer": 1,
-            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_khz"
+            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz"
         },
         {
             "type": "knob",
             "control": 21,
             "channel": 0,
             "layer": 1,
-            "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_Mhz"
+            "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz"
         },
 
         {
@@ -82,14 +82,14 @@
         {
             "type": "knob",
             "control": 10,
-            "channel": 4,
+            "channel": 5,
             "layer": 1,
             "dataref": "sim/cockpit/autopilot/heading"
         },
         {
             "type": "knob",
             "control": 10,
-            "channel": 5,
+            "channel": 4,
             "layer": 1,
             "dataref": "sim/cockpit/misc/barometer_setting"
         },
@@ -288,7 +288,7 @@
             "key": "m",
             "mod": "ctrl",
             "layer": 1,
-            "trigger": "toggle"
+            "trigger": "normal"
         },
 
         {
