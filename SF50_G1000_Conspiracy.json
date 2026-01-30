@@ -5,6 +5,15 @@
     [],
     "knob_trigger_amount": 1,
     "interrupt_release": 35,
+    "colors":
+    [
+        { "color": "red", "number": 1 },
+        { "color": "green", "number": 2 },
+        { "color": "blue", "number": 3 },
+        { "color": "yellow", "number": 8 },
+        { "color": "purple", "number": 25 },
+        { "color": "cyan", "number": 26 }
+    ],
     "triggers":
     [
         {
@@ -217,6 +226,16 @@
         },
 
         {
+            "control": 47,
+            "channel": 0,
+            "type": "button",
+            "key": "j",
+            "mod": "",
+            "layer": 1,
+            "trigger": "normal"
+        },
+
+        {
             "control": 14,
             "channel": 1,
             "type": "button",
@@ -279,7 +298,9 @@
             "key": "8",
             "mod": "alt",
             "layer": 1,
-            "trigger": "toggle"
+            "trigger": "toggle",
+            "color": "purple",
+            "colorpad": 9
         },
         {
             "control": 36,
@@ -288,7 +309,9 @@
             "key": "m",
             "mod": "ctrl",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "purple",
+            "colorpad": 4
         },
 
         {
@@ -298,7 +321,9 @@
             "key": "e",
             "mod": "",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "blue",
+            "colorpad": 1
         },
         {
             "control": 34,
@@ -307,7 +332,9 @@
             "key": "a",
             "mod": "",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 2
         },
         {
             "control": 35,
@@ -316,7 +343,9 @@
             "key": "h",
             "mod": "",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "green",
+            "colorpad": 3
         },
 
         {
@@ -326,7 +355,9 @@
             "key": "q",
             "mod": "",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "blue",
+            "colorpad": 6
         },
         {
             "control": 29,
@@ -335,7 +366,9 @@
             "key": "y",
             "mod": "",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 7
         },
         {
             "control": 30,
@@ -344,17 +377,21 @@
             "key": "f",
             "mod": "",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "green",
+            "colorpad": 8
         },
 
         {
-            "control": 26,
+            "control": 16,
             "channel": 1,
             "type": "button",
             "key": "a",
             "mod": "ctrl",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "cyan",
+            "colorpad": 24
         },
         {
             "control": 21,
@@ -363,15 +400,17 @@
             "key": "p",
             "mod": "ctrl",
             "layer": 1,
-            "trigger": "normal"
+            "trigger": "normal",
+            "color": "cyan",
+            "colorpad": 19
         },
 
         {
             "control": 37,
             "channel": 0,
             "type": "button",
-            "key": "f5",
-            "mod": "ctrl",
+            "key": "z",
+            "mod": "",
             "layer": 1,
             "trigger": "normal"
         },

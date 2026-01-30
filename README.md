@@ -110,6 +110,34 @@ Next, put in your triggers section - the area that defines what is happening at 
 }
 ```
 
+The next part is optional. If your controller has pads which can light up in various colors, you can define the colors for these pads like so:
+
+```
+{
+    "input": "Input Name 0",
+    "output": "Output Name 1",
+    "knob_trigger_amount": 1,
+    "interrupt_release": 35,
+    "colors":
+    [
+        { "color": "red", "number": 1 },
+        { "color": "green", "number": 2 },
+        { "color": "blue", "number": 3 },
+        { "color": "yellow", "number": 8 },
+        { "color": "purple", "number": 25 },
+        { "color": "cyan", "number": 26 }
+    ],
+    "triggers":
+    [
+    ]
+}
+```
+
+The numbers represent the velocities for the pad in order to light up at a certain color. For my Samson Conspiracy, the velocities are as you can see for the pad buttons. If you want to light up normal buttons (meaning not configured as "toggle" mode), you will have to consult the technical manual of your controller to find the specific number of a specific color.
+
+You can then define one of these to be the color for pads with "normal" trigger assignment. These pads will light up in that color permanently.
+
+
 Within the "triggers" area, we can begin to define what we want to happen. Below is a simple example for a
 
 - Knob
@@ -197,7 +225,34 @@ Arguably the easiest to configure - you basically define the control and the cha
 }
 ```
 
+If you want a button to be lit permanently, it must be a "normal" trigger, and it must be specified like so:
+
+```
+{
+    "control": 36,
+    "channel": 1,
+    "type": "button",
+    "key": "m",
+    "mod": "ctrl",
+    "layer": 1,
+    "trigger": "normal",
+    "color": "purple",
+    "colorpad": 4
+},
+```
+
+You define the color you described in the top section, and what I call the "color pad". Controls and channels often differ from the actual control number of a button on the device.
+
+As you can see, in this example the control is 36 and the channel is 1. Through experimentation I figured out my pads have sequential control numbers, and in this case it is 4.
+
+You will need to consult the technical manual of the controller to learn which control corresponds to which pad.
+
+The "colorpad" entry is ignored if you do not have a "color" entry.
+
+The "colorpad" and "color" entries are ignored if the "trigger" is set to "toggle".
+
 Triggers are described below.
+
 
 **Sliders**
 

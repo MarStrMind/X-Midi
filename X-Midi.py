@@ -34,227 +34,193 @@ dref = None
 # Send a midi signal
 def send_midi(type, note, data):
 	global midi_out
-	n = note
-	s = data
-	midi_out.send(mido.Message(type, note=n, velocity=s))
+	midi_out.send(mido.Message(type, note=note, velocity=data))
 
 
 # Attempt to reset lights
-def reset_lights(mididev):
+def reset_lights():
 	for i in range(127):
-		send_midi(mididev, "note_on", i, 0)
+		send_midi("note_on", i, 0)
 
 
 # Change layer
 def change_active_layer(direction):
 	global act_layer
 	if direction == "up":
-		if act_layer >= 1:
-			act_layer = act_layer + 1
-	if direction == "down":
-		if act_layer >= 2:
-			act_layer = act_layer - 1
-			if act_layer == 0:
-				act_layer = 1
+		act_layer = min(act_layer + 1, 3)
+	elif direction == "down":
+		act_layer = max(1, act_layer - 1)
 
 
 # Press and release a key with or without modifier
 def press_key(key, mod, func="normal"):
 	if func == "normal":
-		if mod != "":
-			keyboard.press(mod+"+"+key)
-			sleep(.2)
-			keyboard.release(mod+"+"+key)
+		if mod:
+			keyboard.press_and_release(mod+"+"+key)
 		else:
-			keyboard.press(key)
-			sleep(.2)
-			keyboard.release(key)
-	if func == "press":
-		if mod != "":
+			keyboard.press_and_release(key)
+	elif func == "press":
+		if mod:
 			keyboard.press(mod+"+"+key)
 		else:
 			keyboard.press(key)
-	if func == "release":
-		if mod != "":
+	elif func == "release":
+		if mod:
 			keyboard.release(mod+"+"+key)
 		else:
 			keyboard.release(key)
+
 	if key == "layer_up":
 		change_active_layer("up")
-	if key == "layer_down":
+	elif key == "layer_down":
 		change_active_layer("down")
 
 
 # Handles a MIDI event.
 # Acts depending on what the event is.
 def handle_midi_message(message):
-	global act_layer
-	global json_data
-	global dataref_data
-	global needsleep
-	global dref
-	
-	for i in range(len(json_data["triggers"])):
-		
-		# Only react on those with the current active layer
-		if json_data["triggers"][i]["layer"] == act_layer:
+    global act_layer
+    global json_data
+    global dataref_data
+    global needsleep
+    global dref
+    
+    for trigger in json_data["triggers"]:
+        if trigger["layer"] == act_layer:
+            if trigger["type"] == "button":
+                handle_button_event(message, trigger)
+            elif trigger["type"] == "knob":
+                handle_knob_event(message, trigger)
+            elif trigger["type"] == "slider":
+                handle_slider_event(message, trigger)
 
-			# Button
-			if json_data["triggers"][i]["type"] == "button":
-				cn = message.channel
-				if message.type == "note_on":
-					if message.note == json_data["triggers"][i]["control"] and json_data["triggers"][i]["channel"] == cn:
-						if json_data["triggers"][i]["key"] == "layerup":
-							change_active_layer("up")
-						if json_data["triggers"][i]["key"] == "layerdown":
-							change_active_layer("down")
-						if json_data["triggers"][i]["key"] != "RESET" and json_data["triggers"][i]["key"] != "layerup" and json_data["triggers"][i]["key"] != "layerdown":
-							k = json_data["triggers"][i]["key"]
-							m = json_data["triggers"][i]["mod"]
-							needsleep = False
-							press_key(k, m)
-				if message.type == "note_off" and message.note == json_data["triggers"][i]["control"] and json_data["triggers"][i]["channel"] == cn and json_data["triggers"][i]["trigger"] == "toggle":
-						k = json_data["triggers"][i]["key"]
-						m = json_data["triggers"][i]["mod"]
-						needsleep = False
-						press_key(k, m)
+def handle_button_event(message, trigger):
+    cn = message.channel
+    if message.type == "note_on":
+        if message.note == trigger["control"] and trigger["channel"] == cn:
+            if trigger["key"] == "layerup":
+                change_active_layer("up")
+            elif trigger["key"] == "layerdown":
+                change_active_layer("down")
+            else:
+                k = trigger["key"]
+                m = trigger["mod"]
+                needsleep = False
+                press_key(k, m)
+    if message.type == "note_off" and message.note == trigger["control"] and trigger["channel"] == cn and trigger["trigger"] == "toggle":
+        k = trigger["key"]
+        m = trigger["mod"]
+        needsleep = False
+        press_key(k, m)
 
-			# A knob has been turned
-			if json_data["triggers"][i]["type"] == "knob":
-				global kn_value
-				global kn_tr_amount
-				global kn_dataref
+def handle_knob_event(message, trigger):
+    global kn_value
+    global kn_tr_amount
+    global kn_dataref
 
-				# Trigger only at delta of this number, if present
-				if json_data["knob_trigger_amount"]:
-					kn_tr_amount = json_data["knob_trigger_amount"]
+    if json_data["knob_trigger_amount"]:
+        kn_tr_amount = json_data["knob_trigger_amount"]
 
-				if message.type == "control_change":
+    if message.type == "control_change":
+        c = message.control
+        v = message.value
+        cn = message.channel
 
-					c = message.control
-					v = message.value
-					cn = message.channel
+        if trigger["control"] == c and trigger["channel"] == cn:
+            knpos = find_knob_position(c, cn)
+            handle_knob_initial_value(knpos, v)
+            engage_soft_clutch(knpos, v)
+            release_interrupt_if_needed(knpos, v)
 
-					if json_data["triggers"][i]["control"] == c and json_data["triggers"][i]["channel"] == cn:
+            if "dataref" in trigger:
+                handle_knob_dataref_event(trigger, knpos, v)
 
-						knpos = -1
-						for k in range(0, len(kn_value)-1):
-							if kn_value[k][0] == c and kn_value[k][1] == cn:
-								knpos = k
-								break
+            if "events" in trigger:
+                handle_knob_events(trigger, knpos, v)
 
-						# Note initial value instead of the default value in array
-						# then exit loop
-						if kn_value[knpos][5] == 1:
-							kn_value[knpos][5] = 0
-							kn_value[knpos][2] = v
-							break
+def find_knob_position(c, cn):
+    for k in range(len(kn_value) - 1):
+        if kn_value[k][0] == c and kn_value[k][1] == cn:
+            return k
+    return -1
 
-						# Engage soft clutch as needed
-						if v == 0:
-							kn_value[knpos][3] = 1
-							kn_value[knpos][4] = 0
-						if v == 127:
-							kn_value[knpos][3] = 1
-							kn_value[knpos][4] = 1
+def handle_knob_initial_value(knpos, v):
+    if kn_value[knpos][5] == 1:
+        kn_value[knpos][5] = 0
+        kn_value[knpos][2] = v
 
-						# Determine if we need to release the interrupt	
-						if kn_value[knpos][3] == 1:
-							# Interrupt for left direction, knob needs to be turned right
-							# beyond the provided release value
-							if kn_value[knpos][4] == 0:
-								if v >= 0 + json_data["interrupt_release"]:
-									kn_value[knpos][2] = v
-									kn_value[knpos][3] = 0
-							# Interrupt for right direction, knob needs to be turned left
-							# beyond the provided release value
-							if kn_value[knpos][4] == 1:
-								if v <= 127 - json_data["interrupt_release"]:
-									kn_value[knpos][2] = v
-									kn_value[knpos][3] = 0
+def engage_soft_clutch(knpos, v):
+    if v == 0 or v == 127:
+        kn_value[knpos][3] = 1
+        kn_value[knpos][4] = int(v == 127)
 
-						if "dataref" in json_data["triggers"][i]:
+def release_interrupt_if_needed(knpos, v):
+    if kn_value[knpos][3] == 1:
+        if kn_value[knpos][4] == 0 and v >= json_data["interrupt_release"]:
+            kn_value[knpos][2] = v
+            kn_value[knpos][3] = 0
+        elif kn_value[knpos][4] == 1 and v <= 127 - json_data["interrupt_release"]:
+            kn_value[knpos][2] = v
+            kn_value[knpos][3] = 0
 
-							# First we find the value by which we increase and decrease
-							step_value = 0
-							max_value = 0
-							min_value = 0
-							for d in dataref_data["datarefs"]:
-								if d["dataref"] == json_data["triggers"][i]["dataref"]:
-									step_value = d["step"]
-									max_value = d["maximum"]
-									min_value = d["minimum"]
+def handle_knob_dataref_event(trigger, knpos, v):
+    drefpos = find_dataref_position(trigger["dataref"])
+    if kn_value[knpos][3] == 0:
+        val = kn_dataref[drefpos][3]
+        step_value, max_value, min_value = get_step_max_min_values(trigger["dataref"])
+        if v >= (kn_value[knpos][2] + kn_tr_amount):
+            val += step_value
+        elif v <= (kn_value[knpos][2] - kn_tr_amount):
+            val -= step_value
+        kn_value[knpos][2] = v
+        val = max(min(val, max_value), min_value)
+        kn_dataref[drefpos][3] = val
+        dref.WriteDataRef(trigger["dataref"], val)
 
-							drefpos = -1
-							for dr in range(0, len(kn_dataref)):
-								if kn_dataref[dr][2] == json_data["triggers"][i]["dataref"]:
-									drefpos = dr
-									break
+def find_dataref_position(dataref):
+    for dr in range(len(kn_dataref)):
+        if kn_dataref[dr][2] == dataref:
+            return dr
+    return -1
 
-							# Only act if interrupt is not active
-							if kn_value[knpos][3] == 0:
-								val = kn_dataref[drefpos][3]
-								if v >= (kn_value[knpos][2] + kn_tr_amount):
-									val = kn_dataref[drefpos][3] + step_value
+def get_step_max_min_values(dataref):
+    for d in dataref_data["datarefs"]:
+        if d["dataref"] == dataref:
+            return d["step"], d["maximum"], d["minimum"]
+    return 0, 0, 0
 
-								if v <= (kn_value[knpos][2] - kn_tr_amount):
-									val = kn_dataref[drefpos][3] - step_value
-								
-								kn_value[knpos][2] = v
-								if val > max_value:
-									val = min_value
-								if val < min_value:
-									val = max_value
-								kn_dataref[drefpos][3] = val
-								dref.WriteDataRef(json_data["triggers"][i]["dataref"], val)
+def handle_knob_events(trigger, knpos, v):
+    if kn_value[knpos][3] == 0:
+        for event in trigger["events"]:
+            l = event["change"]
+            k = event["key"]
+            m = event["mod"]
 
+            if l == "increase" and v >= (kn_value[knpos][2] + kn_tr_amount):
+                needsleep = False
+                kn_value[knpos][2] = v
+                press_key(k, m)
+            elif l == "decrease" and v <= (kn_value[knpos][2] - kn_tr_amount):
+                needsleep = False
+                kn_value[knpos][2] = v
+                press_key(k, m)
 
-						# Non-dataref based, some key should be pressed
-						if "events" in json_data["triggers"][i]:
-							# Only act if interrupt is not active
-							if kn_value[knpos][3] == 0:
-								for j in range(len(json_data["triggers"][i]["events"])):
-									l = json_data["triggers"][i]["events"][j]["change"]
-									k = json_data["triggers"][i]["events"][j]["key"]
-									m = json_data["triggers"][i]["events"][j]["mod"]
+def handle_slider_event(message, trigger):
+    global sl_value
 
-									if l == "increase":
-										if v >= (kn_value[knpos][2] + kn_tr_amount):
-											needsleep = False
-											kn_value[knpos][2] = v
-											press_key(k, m)
-											#for p in range(kn_value[knpos][2], kn_value[knpos][2] + kn_tr_amount):
-											#	needsleep = False
-											#	press_key(k, m)
-											
-									if l == "decrease":
-										if v <= (kn_value[knpos][2] - kn_tr_amount):
-											needsleep = False
-											kn_value[knpos][2] = v
-											press_key(k, m)
-											#for p in reversed(range(kn_value[knpos][2] - kn_tr_amount, kn_value[knpos][2])):
-											#	needsleep = False
-											#	press_key(k, m)
+    if message.type == "control_change":
+        v = message.value
+        c = message.control
+        cn = message.channel
 
-			# Slider went up or down
-			if json_data["triggers"][i]["type"] == "slider":
-				global sl_value
+        if trigger["control"] == c and trigger["channel"] == cn:
+            for event in trigger["events"]:
+                if v == event["value"]:
+                    k = event["key"]
+                    m = event["mod"]
 
-				if message.type == "control_change":
-
-					v = message.value
-					c = message.control
-					cn = message.channel
-
-					if json_data["triggers"][i]["control"] == c and json_data["triggers"][i]["channel"] == cn:
-						
-						for j in range(len(json_data["triggers"][i]["events"])):
-							if v == json_data["triggers"][i]["events"][j]["value"]:
-								k = json_data["triggers"][i]["events"][j]["key"]
-								m = json_data["triggers"][i]["events"][j]["mod"]
-
-								needsleep = False
-								press_key(k, m)
+                    needsleep = False
+                    press_key(k, m)
 
 
 # Display MIDI messages of the device specified
@@ -284,21 +250,22 @@ def find_all_datarefs(json_data):
 # List MIDI devices
 if sys.argv[1] == "--list":
 	print()
-	print ("Available MIDI input ports:")
+	print("Available MIDI input ports:")
 	if len(mido.get_input_names()) > 0:
 		for port in mido.get_input_names():
 			print("- " + port)
 	print()
-	print ("Available MIDI output ports:")
+	print("Available MIDI output ports:")
 	if len(mido.get_output_names()) > 0:
 		for port in mido.get_output_names():
 			print("- " + port)
 	print()
-	exit
+	sys.exit()
 
 
 # Test messages of the specified MIDI device
 if sys.argv[1] == "--test":
+	midi_out = mido.open_output(sys.argv[3])
 	try:
 		midi_in = mido.open_input(sys.argv[2])
 
@@ -316,60 +283,57 @@ if sys.argv[1] == "--test":
 # Main call
 if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] != "--test":
 
-	json_profile = sys.argv[1]
-	json_f = open(json_profile, "r")
-	json_data = json.loads(json_f.read())
+    json_profile = sys.argv[1]
+    with open(json_profile, "r") as json_f:
+        json_data = json.loads(json_f.read())
 
-	dataref_profile = "./dataref.json"
-	dataref_f = open(dataref_profile, "r")
-	dataref_data = json.loads(dataref_f.read())
-	
-	dref = XPlaneUdp();
-	dref.FindIp()
-	
-	input_port_name = json_data["input"]
-	output_port_name = json_data["output"]
+    dataref_profile = "./dataref.json"
+    with open(dataref_profile, "r") as dataref_f:
+        dataref_data = json.loads(dataref_f.read())
+    
+    dref = XPlaneUdp();
+    dref.FindIp()
+    
+    input_port_name = json_data["input"]
+    output_port_name = json_data["output"]
 
-	find_all_knobs(json_data)
-	find_all_datarefs(json_data)
+    find_all_knobs(json_data)
+    find_all_datarefs(json_data)
 
-	# Add the datarefs we want
-	for d in kn_dataref:
-		dref.AddDataRef(d[2])
+    # Add the datarefs we want
+    for d in kn_dataref:
+        dref.AddDataRef(d[2])
 
-	# Now read the dataref values
-	drefval = dref.GetValues()
-	for dr in range(0, len(kn_dataref)):
-		kn_dataref[dr][3] = drefval[kn_dataref[dr][2]]
+    # Now read the dataref values
+    drefval = dref.GetValues()
+    for dr in range(0, len(kn_dataref)):
+        kn_dataref[dr][3] = drefval[kn_dataref[dr][2]]
 
-	if len(sys.argv) == 4:
-		midi_out = mido.open_output(output_port_name)
+    midi_in = mido.open_input(input_port_name)
+    midi_out = mido.open_output(output_port_name)
 
-		for i in range(0, 127):
-			midi_out.send(mido.Message("note_on", note=i, velocity=0))
-			sleep(0.01)
+    def handle_colors(json_data):
+        if "colors" in json_data:
+            clr = json_data["colors"]
+            for b in json_data["triggers"]:
+                if b["type"] == "button" and "color" in b:
+                    cidx = next((i for i, c in enumerate(clr) if c["color"] == b["color"]), -1)
+                    if cidx != -1:
+                        send_midi("note_on", b["colorpad"], clr[cidx]["number"])
 
-		# Perform init calls
-		for i in range(len(json_data["init"])):
-			n = json_data["init"][i]["note"]
-			s = json_data["init"][i]["signal"]
-			midi_out.send(mido.Message("note_on", note=n, velocity=s))
-			sleep(0.02)
-		midi_out.close()
+    # Initial light-up
+    handle_colors(json_data)
 
-	try:
-		midi_in = mido.open_input(input_port_name)
-		midi_out = mido.open_output(output_port_name)
+    try:
+        while True:
+            for message in midi_in.iter_pending():
+                handle_midi_message(message)
+                handle_colors(json_data)
+            sleep(.05)
 
-		while True:
-			for message in midi_in.iter_pending():
-				handle_midi_message(message)
-			#if needsleep == True:
-			#	sleep(.05)
-			sleep(.05)
+    except KeyboardInterrupt:
+        reset_lights()
+        print("input stopped")
 
-	except KeyboardInterrupt:
-		print("input stopped")
-
-	if midi_in:
-		midi_in.close()
+    if midi_in:
+        midi_in.close()
