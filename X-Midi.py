@@ -9,6 +9,7 @@ from xpudp import *
 kn_interrupt = []
 kn_value = []
 kn_dataref = []
+bt_toggle = []
 
 # Delta at which a knob turning motion in one direction is being detected
 kn_tr_amount = 1
@@ -45,35 +46,38 @@ def reset_lights():
 
 # Change layer
 def change_active_layer(direction):
-	global act_layer
-	if direction == "up":
-		act_layer = min(act_layer + 1, 3)
-	elif direction == "down":
-		act_layer = max(1, act_layer - 1)
+    global act_layer
+    if direction == "up":
+        act_layer = act_layer + 1
+    elif direction == "down":
+        act_layer = act_layer - 1
+        if act_layer < 1:
+            act_layer = 1
 
 
 # Press and release a key with or without modifier
 def press_key(key, mod, func="normal"):
-	if func == "normal":
-		if mod:
-			keyboard.press_and_release(mod+"+"+key)
-		else:
-			keyboard.press_and_release(key)
-	elif func == "press":
-		if mod:
-			keyboard.press(mod+"+"+key)
-		else:
-			keyboard.press(key)
-	elif func == "release":
-		if mod:
-			keyboard.release(mod+"+"+key)
-		else:
-			keyboard.release(key)
+    if key == "layer_up" or key == "layer_down":
+        if key == "layer_up": change_active_layer("up")
+        if key == "layer_down": change_active_layer("down")
 
-	if key == "layer_up":
-		change_active_layer("up")
-	elif key == "layer_down":
-		change_active_layer("down")
+    else:
+        if func == "normal":
+            if mod:
+                keyboard.press_and_release(mod+"+"+key)
+            else:
+                keyboard.press_and_release(key)
+        elif func == "press":
+            if mod:
+                keyboard.press(mod+"+"+key)
+            else:
+                keyboard.press(key)
+        elif func == "release":
+            if mod:
+                keyboard.release(mod+"+"+key)
+            else:
+                keyboard.release(key)
+        
 
 
 # Handles a MIDI event.
@@ -86,7 +90,7 @@ def handle_midi_message(message):
     global dref
     
     for trigger in json_data["triggers"]:
-        if trigger["layer"] == act_layer:
+        if trigger["layer"] == act_layer or trigger["layer"] == "all":
             if trigger["type"] == "button":
                 handle_button_event(message, trigger)
             elif trigger["type"] == "knob":
@@ -95,24 +99,23 @@ def handle_midi_message(message):
                 handle_slider_event(message, trigger)
 
 def handle_button_event(message, trigger):
-    cn = message.channel
     if message.type == "note_on":
-        if message.note == trigger["control"] and trigger["channel"] == cn:
-            if trigger["key"] == "layerup":
-                change_active_layer("up")
-            elif trigger["key"] == "layerdown":
-                change_active_layer("down")
-            else:
-                k = trigger["key"]
-                m = trigger["mod"]
-                needsleep = False
-                press_key(k, m)
-    if message.type == "note_off" and message.note == trigger["control"] and trigger["channel"] == cn and trigger["trigger"] == "toggle":
-        k = trigger["key"]
-        m = trigger["mod"]
-        needsleep = False
-        press_key(k, m)
-
+        cn = message.channel
+        nt = message.note
+        if trigger["control"] == nt and trigger["channel"] == cn and (trigger["layer"] == act_layer or trigger["layer"] == "all"):
+            if trigger["trigger"] == "toggle":
+                for t in range(0, len(bt_toggle)):
+                    if bt_toggle[t][0] == message.note and bt_toggle[t][1] == message.channel:
+                        if bt_toggle[t][2] == 0:
+                            bt_toggle[t][2] = 1
+                        else:
+                            bt_toggle[t][2] = 0
+                        break
+            
+            k = trigger["key"]
+            m = trigger["mod"]
+            press_key(k, m)
+            
 def handle_knob_event(message, trigger):
     global kn_value
     global kn_tr_amount
@@ -247,6 +250,12 @@ def find_all_datarefs(json_data):
 			# in this array as initial value. From there on in we can adjust
 			# the values we want. For example heading.
 
+# We want to add all buttons that function as toggles
+def find_all_toggles(json_data):
+    for t in json_data["triggers"]:
+        if t["type"] == "button" and t["trigger"] == "toggle":
+            bt_toggle.append( [ t["control"], t["channel"], 0, t["layer"] ] )
+
 # List MIDI devices
 if sys.argv[1] == "--list":
 	print()
@@ -299,6 +308,7 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
 
     find_all_knobs(json_data)
     find_all_datarefs(json_data)
+    find_all_toggles(json_data)
 
     # Add the datarefs we want
     for d in kn_dataref:
@@ -319,7 +329,18 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
                 if b["type"] == "button" and "color" in b:
                     cidx = next((i for i, c in enumerate(clr) if c["color"] == b["color"]), -1)
                     if cidx != -1:
-                        send_midi("note_on", b["colorpad"], clr[cidx]["number"])
+                        if b["trigger"] == "toggle":
+                            if [b["control"], b["channel"], 1, act_layer] in bt_toggle:
+                                send_midi("note_on", b["colorpad"], clr[cidx]["number"])
+                            if [b["control"], b["channel"], 0, act_layer] in bt_toggle:
+                                send_midi("note_on", b["colorpad"], 0)
+                            if [b["control"], b["channel"], 1, act_layer] not in bt_toggle:
+                                send_midi("note_on", b["colorpad"], 0)
+                        else:
+                            if b["layer"] == act_layer:
+                                send_midi("note_on", b["colorpad"], clr[cidx]["number"])
+                            else:
+                                send_midi("note_on", b["colorpad"], 0)
 
     # Initial light-up
     handle_colors(json_data)
