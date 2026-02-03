@@ -503,7 +503,7 @@ TYPE     INPUT    TYPE
 |----|---|---|---|----|
 |HDG | 7 | 8 | 9 |XPDR|
 |----|---|---|---|----|
-|ALT |CLR| 0 |ENT|INOP|
+|ALT |CLR| 0 |ENT| VS |
 |----|---|---|---|----|
 |INOP|   |   |   |INOP|
 -----------------------
@@ -523,6 +523,7 @@ xmd_nav2        NAV2 Standby
 xmd_hdg         Heading bug degrees
 xmd_alt         Altitude setting in feet
 xmd_xpdr        Squawk code
+xmd_vspeed      Vertical speed
 ```
 
 For actual data entry, there are twelve identifiers:
@@ -597,6 +598,10 @@ The counterpart is logically constructed like so:
 ```
 
 Following this logic (or my example profile) you will be able to create your own input pads, in any way you like.
+
+### Negative numbers
+
+If you need to enter a negative number, for example a negative vertical speed of -500 fpm, you enter ```0500```. This is only allowed for VS mode at this time.
 
 
 ## Finding the device input and output names

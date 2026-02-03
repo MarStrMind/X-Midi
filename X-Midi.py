@@ -68,7 +68,7 @@ def press_key(key, mod, func="normal"):
     if key == "layer_up" or key == "layer_down":
         if key == "layer_up": change_active_layer("up")
         if key == "layer_down": change_active_layer("down")
-        if "range_color_pads" in json_data and "lights" in json_data:
+        if "range_color_pads" in json_data:
             padrange = json_data["range_color_pads"].split(",")
             reset_lights(int(padrange[0], int(padrange[1])))
         return
@@ -95,6 +95,9 @@ def press_key(key, mod, func="normal"):
         if key == "xmd_0": dataenabler_value = dataenabler_value + "0"
     
         if key == "xmd_ent":
+            chrs = list(dataenabler_value)
+            if chrs[0] == "0" and mod == "xmd_vspeed":
+                 dataenabler_value = "-"+dataenabler_value
             dref.WriteDataRef(dataenabler_dref, int(dataenabler_value))
             dataenabler_value = "" # Reset after sending
 
@@ -401,7 +404,7 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
             sleep(.05)
 
     except KeyboardInterrupt:
-        if "range_color_pads" in json_data and "lights" in json_data:
+        if "range_color_pads" in json_data:
             padrange = json_data["range_color_pads"].split(",")
             reset_lights(int(padrange[0], int(padrange[1])))
         print("input stopped")

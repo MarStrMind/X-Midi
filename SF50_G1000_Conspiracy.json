@@ -562,7 +562,7 @@
             "layer": 2,
             "trigger": "normal",
             "color": "white",
-            "colorpad": 0
+            "colorpad": 1
         },
         {
             "control": 34,
@@ -573,18 +573,18 @@
             "layer": 2,
             "trigger": "normal",
             "color": "white",
-            "colorpad": 0
+            "colorpad": 2
         },
         {
             "control": 35,
             "channel": 1,
             "type": "button",
-            "key": "1",
-            "mod": "",
+            "key": "xmd_enabler",
+            "mod": "xmd_vspeed",
             "layer": 2,
             "trigger": "normal",
             "color": "white",
-            "colorpad": 0
+            "colorpad": 3
         },
         {
             "control": 17,
@@ -594,7 +594,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 15
         },
         {
@@ -605,7 +605,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 10
         },
         {
@@ -616,7 +616,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 5
         },
         {
@@ -627,7 +627,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 16
         },
         {
@@ -638,7 +638,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 11
         },
         {
@@ -649,7 +649,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 6
         },
         {
@@ -660,7 +660,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 17
         },
         {
@@ -671,7 +671,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 12
         },
         {
@@ -682,7 +682,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 7
         },
         {
@@ -693,7 +693,7 @@
             "mod": "",
             "layer": 2,
             "trigger": "normal",
-            "color": "yellow",
+            "color": "cyan",
             "colorpad": 13
         },
         {

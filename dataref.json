@@ -1,10 +1,13 @@
 {
     "datarefs":
     [
-        { "dataref": "sim/cockpit/autopilot/heading", "step": 1, "minimum": 0, "maximum": 360 },
+        { "dataref": "sim/cockpit/autopilot/heading", "step": 1, "minimum": 0, "maximum": 360, "enabler": "xmd_hdg" },
         { "dataref": "sim/cockpit2/radios/actuators/nav1_course_deg_mag_pilot", "step": 1, "minimum": 0, "maximum": 360 },
         { "dataref": "sim/cockpit/misc/barometer_setting", "step": 0.01, "minimum": 10, "maximum": 60 },
         { "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz", "step": 5, "minimum": 11800, "maximum": 13000, "enabler": "xmd_com1" },
+        { "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz", "step": 5, "minimum": 11800, "maximum": 13000, "enabler": "xmd_com2" },
+        { "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_hz", "step": 5, "minimum": 11800, "maximum": 13000, "enabler": "xmd_nav1" },
+        { "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_hz", "step": 5, "minimum": 11800, "maximum": 13000, "enabler": "xmd_nav2" },
         { "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_Mhz", "step": 1, "minimum": 118, "maximum": 130 },
         { "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_Mhz", "step": 1, "minimum": 118, "maximum": 130 },
         { "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_khz", "step": 5, "minimum": 0, "maximum": 995 },
@@ -13,6 +16,8 @@
         { "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_Mhz", "step": 1, "minimum": 108, "maximum": 117 },
         { "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz", "step": 5, "minimum": 0, "maximum": 95 },
         { "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_khz", "step": 5, "minimum": 0, "maximum": 95 },
-        { "dataref": "sim/cockpit2/autopilot/altitude_dial_ft", "step": 100, "minimum": 0, "maximum": 45000 }
+        { "dataref": "sim/cockpit2/autopilot/altitude_dial_ft", "step": 100, "minimum": 0, "maximum": 45000, "enabler": "xmd_alt" },
+        { "dataref": "sim/cockpit2/radios/actuators/transponder_code", "step": 1, "minimum": 1111, "maximum": 7777, "enabler": "xmd_xpdr"},
+        { "dataref": "sim/cockpit/autopilot/vertical_velocity", "step": 100, "minimum": 0, "maximum": 3000, "enabler": "xmd_vspeed"}
     ]
 }
