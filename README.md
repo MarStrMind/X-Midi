@@ -1,12 +1,43 @@
 # X-Midi
 
-A Python implementation allowing for advanced use of MIDI controllers for the X-Plane flight simulator, and potentially other simulators or tools.
+A highly flexible MIDI-to-X-Plane input framework supporting unlimited controllers, layers, profiles, and direct DataRef manipulation. Designed to replace dedicated cockpit hardware with a single, configurable MIDI device.
 
 The primary aim of this script is the relatively straight-forward use of practically any MIDI controller in existence, with X-Plane. It is designed in such a way that it would be theoretically possible to have only one controller, and control an entire Boeing or Airbus with it - regardless of the size of the controller.
 
 I have personally successfully flown the Cessna Skyhawk 172 and the Cirrus Vision Jet SF-50 to multiple destinations using this implementation.
 
 In theory, you could also use this script and your MIDI controller to control your Twitch livestream, effectively turning your MIDI controller into an advanced Stream Deck. In more extreme scenarios, you could control your plane AND your stream at the same time. The only limit is your imagination, really.
+
+## Design Philosophy
+
+The goal is not to mimic specific hardware panels, but to create a flexible, state-aware input system that adapts to the aircraft, workflow, and pilot preferences.
+
+One device. Many layers. No hardcoded limitations.
+
+## Feature summary
+
+- Dynamic bindings for all MIDI input types (buttons, encoders, sliders)
+- Multiple event types per control (increase/decrease, value-based triggers)
+- Automatic encoder braking at value limits with self-releasing thresholds
+- Supports both virtual key combinations and direct X-Plane DataRef manipulation
+- Flexible definition of lighting on pad buttons (if the controller supports it)
+- DataRefs defined in extensible JSON files
+- Unlimited profiles for unlimited controllers
+- Unlimited layers per profile (including keypad / MCDU-style input)
+- Fully configurable pad illumination (including toggle state feedback)
+- One controller can operate anything from VLJs to complex airliners
+- Can be used outside the simulator (e.g. OBS, system shortcuts)
+
+## Example Use Case
+
+- Layer 1: Primary flight controls
+- Layer 2: Numeric input (frequencies, QNH, altitude, heading)
+- Layer 3: Overhead panel switches and buttons
+- Layer 4: Control OBS and your livestream during your flight, also right from your controller
+
+Dynamic LED feedback per layer
+
+Direct DataRef commits only on confirmation
 
 ## Acknowledgement
 
@@ -198,6 +229,7 @@ These are, to my knowledge, covering all available controls on a MIDI controller
 }
 ```
 
+
 **Knobs**
 
 I have updated the code so that there is a kind of "auto-interrupt", as knobs mostly only register values from 0 to 127.
@@ -241,15 +273,66 @@ If you want a button to be lit permanently, it must be a "normal" trigger, and i
 },
 ```
 
-You define the color you described in the top section, and what I call the "color pad". Controls and channels often differ from the actual control number of a button on the device.
-
 As you can see, in this example the control is 36 and the channel is 1. Through experimentation I figured out my pads have sequential control numbers, and in this case it is 4.
 
-You will need to consult the technical manual of the controller to learn which control corresponds to which pad.
+The "colorpad" entry is ignored if you do not have a "color" entry. The "colorpad" and "color" entries are ignored if the "trigger" is set to "toggle".
 
-The "colorpad" entry is ignored if you do not have a "color" entry.
+If you want a light to turn on if either the button is just a button ("trigger": "normal") or acts as a toggle ("trigger": "toggle"), you will also need to define this at the button, like so:
 
-The "colorpad" and "color" entries are ignored if the "trigger" is set to "toggle".
+```
+{
+    [...]
+
+        {
+            "type": "button",
+            "control": 46,
+            "channel": 0,
+            "key": "f",
+            "mod": "shift",
+            "layer": 1,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 7
+        },
+
+    [...]
+}
+```
+
+As described above, the "color" value must match one of the entries you defined earlier.
+
+In addition, you will also need to define the "colorpad" value. This is the actual control number of the pad/button, independent of its channel and control value. As this is different for every controller, you will either have to experiment or consult the technical manual of the controller. In almost all cases every pad/button has a number between 0-127. On my Samson Conspiracy for example, the pads go from 0 to 24.
+
+For this reason you will also need to define the range of the pads in the JSON of your profile. The entry is:
+
+```"range_color_pads": "0,24",```
+
+You will need to define the first and last pad's control numbers. It should look like this:
+
+```
+{
+    "input": "Conspiracy 0",
+    "output": "Conspiracy 1",
+    "init":
+    [],
+    "knob_trigger_amount": 1,
+    "interrupt_release": 35,
+    "range_color_pads": "0,24",
+    "colors":
+    [
+        { "color": "red", "number": 1 },
+        { "color": "green", "number": 2 },
+        { "color": "blue", "number": 3 },
+        { "color": "yellow", "number": 8 },
+        { "color": "purple", "number": 25 },
+        { "color": "cyan", "number": 26 },
+        { "color": "white", "number": 27 }
+    ],
+
+    [...]
+```
+
+Please have a look at the supplied example profile ```SF50_G1000_Conspiracy.json``` to see how exactly it is implemented.
 
 Triggers are described below.
 
@@ -344,25 +427,27 @@ Define on which layer this action lies.
 
 Instead of a key to press, you declare the special directive ```layer_up``` or ```layer_down``` as the key to be pressed, and that will switch between the layers for you. Modifier keys and layer values are ignored.
 
+Strong recommendation to define the layer as "all" as it will make this button (or element) available on all layers.
+
 For example:
 
 ```
 {
-    "control": 41,
-    "channel": 0,
-    "type": "button",
-    "key": "layer_up",
-    "mod": "",
-    "layer": 1,
-    "trigger": "normal"
-},
-{
-    "control": 42,
+    "control": 48,
     "channel": 0,
     "type": "button",
     "key": "layer_down",
     "mod": "",
-    "layer": 1,
+    "layer": "all",
+    "trigger": "normal"
+},
+{
+    "control": 50,
+    "channel": 0,
+    "type": "button",
+    "key": "layer_up",
+    "mod": "",
+    "layer": "all",
     "trigger": "normal"
 }
 ```
@@ -401,6 +486,115 @@ As previously discussed, you can have the same control act differently, dependin
 ```
 
 Notice that for layer 2, Ctrl+F instead of Shift-F will be emitted.
+
+
+## Building an MCDU-like input panel
+
+Another addition to the feature-set is the possibility to build MCDU-like input panels. In the supplied example profile, you can see that I have some pads appear again on Layer 2 (toward the bottom of the file). It works like an input panel in which the pilot needs to decide first what value is about to be entered, then the value itself is entered.
+
+Layout:
+
+```
+TYPE     INPUT    TYPE
+-----------------------
+|COM1| 1 | 2 | 3 |COM2|
+|----|---|---|---|----|
+|NAV1| 4 | 5 | 6 |NAV2|
+|----|---|---|---|----|
+|HDG | 7 | 8 | 9 |XPDR|
+|----|---|---|---|----|
+|ALT |CLR| 0 |ENT|INOP|
+|----|---|---|---|----|
+|INOP|   |   |   |INOP|
+-----------------------
+```
+
+As you can see, all but six pads of the 5x5 grid are used.
+
+To make this work, you first need to define which "enablers" (data types) you want to be able to manipulate, and you need to define the button to act as an "enabler" - see example below.
+
+Supported are:
+
+```
+xmd_com1        COM1 Standby
+xmd_com2        COM2 Standby
+xmd_nav1        NAV1 Standby
+xmd_nav2        NAV2 Standby
+xmd_hdg         Heading bug degrees
+xmd_alt         Altitude setting in feet
+xmd_xpdr        Squawk code
+```
+
+For actual data entry, there are twelve identifiers:
+
+```
+xmd_1           Number 1
+xmd_2           Number 2
+xmd_3           Number 3
+xmd_4           Number 4
+xmd_5           Number 5
+xmd_6           Number 6
+xmd_7           Number 7
+xmd_8           Number 8
+xmd_9           Number 9
+xmd_0           Number 0
+xmd_clr         Clear current entry
+xmd_ent         Confirm entry (Enter)
+```
+
+Note: you NEVER adjust the active frequency directly according to flight and aviation rules as the commanding personell need to maintain active communication with ATC. For this reason I am only supporting the standby frequencies you need to manually activate. You may adjust the dataref if you like, but this is not recommended. Especially not if you are flying on VATSIM, PilotEdge, Pilot2ATC, 124thATC, BeyondATC and/or AutoATC.
+
+These enables are to be placed in the root of the JSON profile, like so:
+
+```
+"data_enablers":
+[
+    { "enabler": "xmd_com1", "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz" },
+    { "enabler": "xmd_com2", "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz" },
+    { "enabler": "xmd_nav1", "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_hz" },
+    { "enabler": "xmd_nav2", "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_hz" },
+    { "enabler": "xmd_hdg", "dataref": "sim/cockpit/autopilot/heading" },
+    { "enabler": "xmd_alt", "dataref": "sim/cockpit2/autopilot/altitude_dial_ft" },
+    { "enabler": "xmd_xpdr", "dataref": "sim/cockpit2/radios/actuators/transponder_code" }
+],
+```
+
+A button can only be one thing at a time: either define what to enter, or be a button that enters something.
+
+For example:
+
+```
+{
+    "control": 12,
+    "channel": 1,
+    "type": "button",
+    "key": "xmd_enabler",
+    "mod": "xmd_com1",
+    "layer": 2,
+    "trigger": "normal",
+    "color": "white",
+    "colorpad": 20
+}
+```
+This is the button that enables the modification of the COM1 standby frequency when pressed.
+
+Note the "xmd_enabler" directive at the "key" value.
+
+The counterpart is logically constructed like so:
+
+{
+    "control": 17,
+    "channel": 1,
+    "type": "button",
+    "key": "xmd_1",
+    "mod": "",
+    "layer": 2,
+    "trigger": "normal",
+    "color": "yellow",
+    "colorpad": 15
+},
+
+Following this logic (or my example profile) you will be able to create your own input pads, in any way you like.
 
 
 ## Finding the device input and output names

@@ -5,6 +5,7 @@
     [],
     "knob_trigger_amount": 1,
     "interrupt_release": 35,
+    "range_color_pads": "0,24",
     "colors":
     [
         { "color": "red", "number": 1 },
@@ -14,6 +15,16 @@
         { "color": "purple", "number": 25 },
         { "color": "cyan", "number": 26 },
         { "color": "white", "number": 27 }
+    ],
+    "data_enablers":
+    [
+        { "enabler": "xmd_com1", "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz" },
+        { "enabler": "xmd_com2", "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz" },
+        { "enabler": "xmd_nav1", "dataref": "sim/cockpit2/radios/actuators/nav1_standby_frequency_hz" },
+        { "enabler": "xmd_nav2", "dataref": "sim/cockpit2/radios/actuators/nav2_standby_frequency_hz" },
+        { "enabler": "xmd_hdg", "dataref": "sim/cockpit/autopilot/heading" },
+        { "enabler": "xmd_alt", "dataref": "sim/cockpit2/autopilot/altitude_dial_ft" },
+        { "enabler": "xmd_xpdr", "dataref": "sim/cockpit2/radios/actuators/transponder_code" }
     ],
     "triggers":
     [
@@ -485,6 +496,227 @@
             "mod": "ctrl",
             "layer": 1,
             "trigger": "normal"
+        },
+
+        {
+            "control": 12,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_com1",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 20
+        },
+        {
+            "control": 13,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_nav1",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 21
+        },
+        {
+            "control": 14,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_hdg",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 22
+        },
+        {
+            "control": 15,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_alt",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 23
+        },
+        {
+            "control": 32,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_com2",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 0
+        },
+        {
+            "control": 33,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_nav2",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 0
+        },
+        {
+            "control": 34,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_enabler",
+            "mod": "xmd_xpdr",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 0
+        },
+        {
+            "control": 35,
+            "channel": 1,
+            "type": "button",
+            "key": "1",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "white",
+            "colorpad": 0
+        },
+        {
+            "control": 17,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_1",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 15
+        },
+        {
+            "control": 84,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_2",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 10
+        },
+        {
+            "control": 27,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_3",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 5
+        },
+        {
+            "control": 18,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_4",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 16
+        },
+        {
+            "control": 23,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_5",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 11
+        },
+        {
+            "control": 28,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_6",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 6
+        },
+        {
+            "control": 19,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_7",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 17
+        },
+        {
+            "control": 24,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_8",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 12
+        },
+        {
+            "control": 29,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_9",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 7
+        },
+        {
+            "control": 25,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_0",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "yellow",
+            "colorpad": 13
+        },
+        {
+            "control": 20,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_clr",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "red",
+            "colorpad": 18
+        },
+        {
+            "control": 30,
+            "channel": 1,
+            "type": "button",
+            "key": "xmd_ent",
+            "mod": "",
+            "layer": 2,
+            "trigger": "normal",
+            "color": "green",
+            "colorpad": 8
         },
 
         {

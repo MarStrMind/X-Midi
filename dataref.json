@@ -4,6 +4,7 @@
         { "dataref": "sim/cockpit/autopilot/heading", "step": 1, "minimum": 0, "maximum": 360 },
         { "dataref": "sim/cockpit2/radios/actuators/nav1_course_deg_mag_pilot", "step": 1, "minimum": 0, "maximum": 360 },
         { "dataref": "sim/cockpit/misc/barometer_setting", "step": 0.01, "minimum": 10, "maximum": 60 },
+        { "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz", "step": 5, "minimum": 11800, "maximum": 13000, "enabler": "xmd_com1" },
         { "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_Mhz", "step": 1, "minimum": 118, "maximum": 130 },
         { "dataref": "sim/cockpit2/radios/actuators/com2_standby_frequency_Mhz", "step": 1, "minimum": 118, "maximum": 130 },
         { "dataref": "sim/cockpit2/radios/actuators/com1_standby_frequency_khz", "step": 5, "minimum": 0, "maximum": 995 },

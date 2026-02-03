@@ -31,6 +31,10 @@ needsleep = True
 # The dataref object
 dref = None
 
+# Which value should be set when a data enabler is active
+dataenabler_value = ""
+dataenabler_dref  = ""
+
 
 # Send a midi signal
 def send_midi(type, note, data):
@@ -39,8 +43,8 @@ def send_midi(type, note, data):
 
 
 # Attempt to reset lights
-def reset_lights():
-	for i in range(127):
+def reset_lights(start=0, end=127):
+	for i in range(start, end):
 		send_midi("note_on", i, 0)
 
 
@@ -57,9 +61,47 @@ def change_active_layer(direction):
 
 # Press and release a key with or without modifier
 def press_key(key, mod, func="normal"):
+    global dataenabler_value
+    global dataenabler_dref
+    global dref
+
     if key == "layer_up" or key == "layer_down":
         if key == "layer_up": change_active_layer("up")
         if key == "layer_down": change_active_layer("down")
+        if "range_color_pads" in json_data and "lights" in json_data:
+            padrange = json_data["range_color_pads"].split(",")
+            reset_lights(int(padrange[0], int(padrange[1])))
+        return
+
+    if "xmd_" in key:
+        if key == "xmd_enabler":
+            dataenabler_value = "" # Reset just in case
+
+            for d in dataref_data["datarefs"]:
+                if "enabler" in d:
+                    if d["enabler"] == mod:
+                        dataenabler_dref = d["dataref"]
+                        break
+
+        if key == "xmd_1": dataenabler_value = dataenabler_value + "1"
+        if key == "xmd_2": dataenabler_value = dataenabler_value + "2"
+        if key == "xmd_3": dataenabler_value = dataenabler_value + "3"
+        if key == "xmd_4": dataenabler_value = dataenabler_value + "4"
+        if key == "xmd_5": dataenabler_value = dataenabler_value + "5"
+        if key == "xmd_6": dataenabler_value = dataenabler_value + "6"
+        if key == "xmd_7": dataenabler_value = dataenabler_value + "7"
+        if key == "xmd_8": dataenabler_value = dataenabler_value + "8"
+        if key == "xmd_9": dataenabler_value = dataenabler_value + "9"
+        if key == "xmd_0": dataenabler_value = dataenabler_value + "0"
+    
+        if key == "xmd_ent":
+            dref.WriteDataRef(dataenabler_dref, int(dataenabler_value))
+            dataenabler_value = "" # Reset after sending
+
+        if key == "xmd_clr":
+            dataenabler_value = ""
+
+        return
 
     else:
         if func == "normal":
@@ -102,7 +144,7 @@ def handle_button_event(message, trigger):
     if message.type == "note_on":
         cn = message.channel
         nt = message.note
-        if trigger["control"] == nt and trigger["channel"] == cn and (trigger["layer"] == act_layer or trigger["layer"] == "all"):
+        if trigger["control"] == nt and trigger["channel"] == cn and trigger["layer"] == act_layer:
             if trigger["trigger"] == "toggle":
                 for t in range(0, len(bt_toggle)):
                     if bt_toggle[t][0] == message.note and bt_toggle[t][1] == message.channel:
@@ -115,6 +157,14 @@ def handle_button_event(message, trigger):
             k = trigger["key"]
             m = trigger["mod"]
             press_key(k, m)
+
+        if trigger["control"] == nt and trigger["channel"] == cn and (trigger["key"] == "layer_up" or trigger["key"] == "layer_down"):
+            k = trigger["key"]
+            m = ""
+            press_key(k, m)
+
+        handle_colors(json_data)
+
             
 def handle_knob_event(message, trigger):
     global kn_value
@@ -255,6 +305,24 @@ def find_all_toggles(json_data):
     for t in json_data["triggers"]:
         if t["type"] == "button" and t["trigger"] == "toggle":
             bt_toggle.append( [ t["control"], t["channel"], 0, t["layer"] ] )
+        else:
+            bt_toggle.append( [ t["control"], t["channel"], 1, t["layer"] ] )
+
+
+def handle_colors(json_data):
+    if "colors" in json_data:
+        clr = json_data["colors"]
+        #padrange = json_data["range_color_pads"].split(",")
+        #reset_lights(int(padrange[0], int(padrange[1])))
+        for b in json_data["triggers"]:
+            if b["type"] == "button" and b["layer"] == act_layer and "color" in b:
+                cidx = next((i for i, c in enumerate(clr) if c["color"] == b["color"]), -1)
+                if cidx != -1:
+                    #if b["trigger"] == "toggle":
+                    if [b["control"], b["channel"], 1, act_layer] in bt_toggle:
+                        send_midi("note_on", b["colorpad"], clr[cidx]["number"])
+                    else:
+                        send_midi("note_on", b["colorpad"], 0)
 
 # List MIDI devices
 if sys.argv[1] == "--list":
@@ -322,26 +390,6 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
     midi_in = mido.open_input(input_port_name)
     midi_out = mido.open_output(output_port_name)
 
-    def handle_colors(json_data):
-        if "colors" in json_data:
-            clr = json_data["colors"]
-            for b in json_data["triggers"]:
-                if b["type"] == "button" and "color" in b:
-                    cidx = next((i for i, c in enumerate(clr) if c["color"] == b["color"]), -1)
-                    if cidx != -1:
-                        if b["trigger"] == "toggle":
-                            if [b["control"], b["channel"], 1, act_layer] in bt_toggle:
-                                send_midi("note_on", b["colorpad"], clr[cidx]["number"])
-                            if [b["control"], b["channel"], 0, act_layer] in bt_toggle:
-                                send_midi("note_on", b["colorpad"], 0)
-                            if [b["control"], b["channel"], 1, act_layer] not in bt_toggle:
-                                send_midi("note_on", b["colorpad"], 0)
-                        else:
-                            if b["layer"] == act_layer:
-                                send_midi("note_on", b["colorpad"], clr[cidx]["number"])
-                            else:
-                                send_midi("note_on", b["colorpad"], 0)
-
     # Initial light-up
     handle_colors(json_data)
 
@@ -353,7 +401,9 @@ if len(mido.get_input_names()) > 0 and sys.argv[1] != "--list" and sys.argv[1] !
             sleep(.05)
 
     except KeyboardInterrupt:
-        reset_lights()
+        if "range_color_pads" in json_data and "lights" in json_data:
+            padrange = json_data["range_color_pads"].split(",")
+            reset_lights(int(padrange[0], int(padrange[1])))
         print("input stopped")
 
     if midi_in:
