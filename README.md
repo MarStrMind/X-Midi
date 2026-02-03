@@ -582,6 +582,7 @@ Note the "xmd_enabler" directive at the "key" value.
 
 The counterpart is logically constructed like so:
 
+```
 {
     "control": 17,
     "channel": 1,
@@ -593,6 +594,7 @@ The counterpart is logically constructed like so:
     "color": "yellow",
     "colorpad": 15
 },
+```
 
 Following this logic (or my example profile) you will be able to create your own input pads, in any way you like.
 
