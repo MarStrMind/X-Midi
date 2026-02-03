@@ -95,9 +95,11 @@ def press_key(key, mod, func="normal"):
         if key == "xmd_0": dataenabler_value = dataenabler_value + "0"
     
         if key == "xmd_ent":
-            chrs = list(dataenabler_value)
-            if chrs[0] == "0" and mod == "xmd_vspeed":
-                 dataenabler_value = "-"+dataenabler_value
+            # Little hack for negative numbers on VS mode
+            if dataenabler_dref == "sim/cockpit/autopilot/vertical_velocity":
+                chrs = list(dataenabler_value)
+                if chrs[0] == "0":
+                    dataenabler_value = "-"+dataenabler_value
             dref.WriteDataRef(dataenabler_dref, int(dataenabler_value))
             dataenabler_value = "" # Reset after sending
 
