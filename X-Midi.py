@@ -100,8 +100,18 @@ def press_key(key, mod, func="normal"):
                 chrs = list(dataenabler_value)
                 if chrs[0] == "0":
                     dataenabler_value = "-"+dataenabler_value
+            
+            # Special case for heading
+            if dataenabler_dref == "sim/cockpit/autopilot/heading":
+                # For some reason this requires me to add a value of 3? o_O
+                dataenabler_value = str(int(dataenabler_value) + 3)
+                for d in range(0, len(kn_dataref)):
+                    if kn_dataref[d][2] == dataenabler_dref:
+                        kn_dataref[d][3] = int(dataenabler_value)
+            
             dref.WriteDataRef(dataenabler_dref, int(dataenabler_value))
-            dataenabler_value = "" # Reset after sending
+            
+            dataenabler_value = "" # Reset after sending 
 
         if key == "xmd_clr":
             dataenabler_value = ""
