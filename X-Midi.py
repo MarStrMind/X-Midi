@@ -108,6 +108,21 @@ def press_key(key, mod, func="normal"):
                 for d in range(0, len(kn_dataref)):
                     if kn_dataref[d][2] == dataenabler_dref:
                         kn_dataref[d][3] = int(dataenabler_value)
+
+            # Same for altitude, except we can't add anything to the value
+            # We can also differentiate between FL notation and value in feet
+            # If you enter 220, altitude will be converted to 22000
+            # If you enter 050, altitude will be converted to 5000
+            # If you enter 26000 or 6000, this value will be used (string length >3)
+            if dataenabler_dref == "sim/cockpit2/autopilot/altitude_dial_ft":
+                if len(dataenabler_value) == 3:
+                    altval = list(dataenabler_value)
+                    if altval[0] == "0":
+                        dataenabler_value = dataenabler_value[1:]
+                    dataenabler_value = dataenabler_value + "00"
+                for d in range(0, len(kn_dataref)):
+                    if kn_dataref[d][2] == dataenabler_dref:
+                        kn_dataref[d][3] = int(dataenabler_value)
             
             dref.WriteDataRef(dataenabler_dref, int(dataenabler_value))
             
